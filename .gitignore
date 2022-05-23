@@ -1,3 +1,7 @@
+# Config with confidential data and python's cache
 config.json
 __pycache__
+
+# Telethon sessions
 *.session
+*.session-journal
