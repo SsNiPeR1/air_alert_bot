@@ -77,7 +77,18 @@ async def triv(event):
         else:
             await event.reply(requests.get(f"https://alerts.com.ua/api/states/{region}", headers=headers).text)
     except:
-        await event.reply(requests.get("https://alerts.com.ua/api/states", headers=headers).text)
+        reply = ""
+        for region in range(1, 25):
+            req = requests.get(f"https://alerts.com.ua/api/states/{region}", headers=headers)
+            parsed = json.loads(req.text)
+
+            id = parsed['state']['id']
+            name = parsed['state']['name']
+            is_alert = parsed['state']['alert']
+
+            reply += printanswer(id=id, name=name, is_alert=is_alert) + "\n"
+
+        await event.reply(reply)
 @bot.on(events.NewMessage(incoming=True, pattern="/ids"))
 async def list_regions(event):
     await event.reply(regions)
