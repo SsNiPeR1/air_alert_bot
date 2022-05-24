@@ -1,5 +1,5 @@
 from .. import API_TOKEN, bot
-from telethon import events, Button
+from telethon import events
 import requests
 import json
 
@@ -92,3 +92,23 @@ async def triv(event):
 @bot.on(events.NewMessage(incoming=True, pattern="/ids"))
 async def list_regions(event):
     await event.reply(regions)
+
+@bot.on(events.InlineQuery)
+async def no_pattern(event):
+    builder = event.builder
+    
+    headers = {"X-API-Key": API_TOKEN}
+    x = requests.get("https://alerts.com.ua/api/states", headers=headers)
+    reply = ""
+
+    for region in range(1, 25):
+        req = requests.get(f"https://alerts.com.ua/api/states/{region}", headers=headers)
+        parsed = json.loads(req.text)
+
+        id = parsed['state']['id']
+        name = parsed['state']['name']
+        is_alert = parsed['state']['alert']
+
+        reply += printanswer(id=id, name=name, is_alert=is_alert) + "\n"
+
+    await event.answer([builder.article("Всі регіони", text=reply)])
